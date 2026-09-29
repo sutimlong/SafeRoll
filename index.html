@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeRoll - Secure Media Offload</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body class="status-idle">
+    <div class="app-container">
+        <!-- Hamburger Menu Button -->
+        <button id="settings-toggle" class="hamburger-btn">☰</button>
+
+        <main class="main-content">
+            <!-- Left Column: File Browser -->
+            <section class="panel left-panel glass">
+                <header class="panel-header">
+                    <h2>檔案瀏覽器</h2>
+                </header>
+                <div class="panel-content">
+                    <ul class="file-list" id="source-browser">
+                        <!-- Dynamic file list will be injected here -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Middle Column: Source and Destination -->
+            <section class="middle-column">
+                <!-- Middle Top: Files to Copy -->
+                <div class="panel middle-panel glass" id="drop-source">
+                    <header class="panel-header">
+                        <h2>準備複製的檔案 (Sources)</h2>
+                    </header>
+                    <div class="panel-content drop-zone" id="source-list">
+                        <div class="drop-placeholder">點擊選擇或從左側拖曳至此</div>
+                    </div>
+                </div>
+
+                <!-- Middle Bottom: Destination -->
+                <div class="panel middle-panel glass" id="drop-dest">
+                    <header class="panel-header">
+                        <h2>複製目的資料夾 (Destinations)</h2>
+                    </header>
+                    <div class="panel-content drop-zone" id="dest-list">
+                        <div class="drop-placeholder">點擊選擇或從左側拖曳至此</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Settings -->
+            <section class="panel right-panel glass" id="settings-panel">
+                <header class="panel-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>複製設定</h2>
+                    <button id="close-settings" class="close-btn">×</button>
+                </header>
+                <div class="panel-content settings-content">
+                    <div class="settings-group">
+                        <h3>校驗與驗證 (Verification)</h3>
+                        <label><input type="checkbox" id="use-xxhash" checked> xxhash64</label>
+                        <label><input type="checkbox" id="use-md5" checked> MD5</label>
+                        
+                        <label style="margin-top: 10px; display: block;">重覆檔案處理方式:</label>
+                        <select id="collision-mode" class="select-input">
+                            <option selected>嚴格報警並中止 (建議)</option>
+                            <option>自動更名加序號</option>
+                            <option>跳過相同 Checksum 檔案</option>
+                        </select>
+                    </div>
+
+
+
+                    <div class="settings-group">
+                        <h3>報表與追蹤 (Offload Reports)</h3>
+                        <label>匯出格式:</label>
+                        <div class="checkbox-grid">
+                            <label><input type="checkbox" id="export-pdf" checked> PDF</label>
+                            <label><input type="checkbox" id="export-csv"> CSV</label>
+                        </div>
+                        <label><input type="checkbox" checked> 包含檔案中繼資料 (Metadata)</label>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>自動化與通知 (Automation)</h3>
+                        <label><input type="checkbox"> 偵測記憶卡自動套用 Preset</label>
+                        <label><input type="checkbox" id="sound-alert" checked> 系統音效提示</label>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>一般設定 (General)</h3>
+                        <label>介面語言:</label>
+                        <select class="select-input">
+                            <option>繁體中文</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Footer: Progress & Action -->
+        <footer class="footer-bar glass">
+            <div class="progress-section">
+                <div class="progress-info" style="margin-bottom: 10px;">
+                    <span id="speed-text">-- MB/s</span>
+                    <span id="files-text">0 / 0 檔案</span>
+                    <span id="eta-text" style="color:#a0aabf; font-size:12px; float:right;">預計剩餘時間: --:--</span>
+                </div>
+                
+                <div class="progress-item" style="margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; color:#a0aabf;">
+                        <span>純拷貝 (Copy)</span><span id="p1-text">等待開始...</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="p1-bar"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item" style="margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; color:#a0aabf;">
+                        <span>來源校驗 (Source Hash)</span><span id="p2-text">等待開始...</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="p2-bar"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item" style="margin-bottom: 8px;">
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; color:#a0aabf;">
+                        <span>目標校驗 (Dest Hash)</span><span id="p3-text">等待開始...</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="p3-bar"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <button class="action-btn" id="start-copy-btn">開始安全拷貝</button>
+                <button class="action-btn hidden" id="open-folder-btn" style="font-size: 0.85rem; padding: 0.5rem 1rem; background: rgba(0,0,0,0.2);">顯示拷貝資料夾</button>
+            </div>
+        </footer>
+        <div class="app-credit">蘇廷融 製作，2026</div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
