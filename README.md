@@ -43,8 +43,7 @@ SafeRoll 的開發結合了現代 Web 前端技術與強大的 Python 後端：
 
 1. 前往本專案的 [Releases 頁面](../../releases)（或點擊 GitHub 右側的 Releases 區塊）。
 2. 在最新的發布版本 (Latest Release) 中，尋找適合您作業系統的檔案：
-   - macOS 使用者請下載 `.dmg` 或 macOS 版壓縮檔。
-   - Windows 使用者請下載 `.exe` 安裝檔。
+   - macOS 使用者請下載 `.zip` macOS 壓縮檔。
 3. 下載完成後，解壓縮或掛載映像檔，即可直接開啟執行，不須額外設定環境！
 
 ---
